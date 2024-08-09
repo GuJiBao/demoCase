@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    function* arrayToGenerator(arr) {
+      for (let i = 0; i < arr.length; i++) {
+        yield arr[i];
+      }
+    }
+
+    const myArray = [10, 20, 30, 40, 50];
+    const generatorInstance = arrayToGenerator(myArray);
+
+    // console.log("使用 for...of:");
+    // for (const value of generatorInstance) {
+    //   console.log(value);
+    // }
+
+    console.log("\n使用 next 方法:");
+    let result = generatorInstance.next();
+    while (!result.done) {
+      console.log(result.value);
+      result = generatorInstance.next();
+    }
+  </script>
+</body>
+</html>

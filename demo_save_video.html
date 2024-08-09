@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <video id="video" width="650" height="480"></video>
+  <div>
+    <button id="startBtn">开始录屏</button><button id="stopBtn">结束</button>
+  </div>
+  <script>
+    let video = document.getElementById('video');
+    let startBtn = document.getElementById('startBtn');
+    let stopBtn = document.getElementById('stopBtn');
+
+    let recordedChunks = [];
+    let mediaRecorder = null;
+
+    startBtn.addEventListener('click', () => {
+      if (navigator.getUserMedia) {
+        navigator.getUserMedia({
+          video: true,
+          audio: true
+        }, function(stream) {
+          video.srcObject = stream;
+          video.onloadedmetadata = function() {
+            video.play();
+          }
+          // 启动录制
+          startSaveVideo(stream);
+        }, function(err) {
+          console.log("The following error occurred: " + err.name);
+        })
+      } else {
+        console.log("getUserMedia not supported");
+      }
+    })
+
+    function startSaveVideo(stream) {
+      mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'video/webm;codecs=vp9'
+      })
+
+      mediaRecorder.ondataavailable = function(e) {
+        if (e.data.size > 0) {
+          recordedChunks.push(e.data);
+        }
+      }
+
+      mediaRecorder.onstop = function() {
+        const blob = new Blob(recordedChunks, {
+          type: 'video/webm'
+        })
+        recordedChunks = []
+
+        // 创建一个链接功能用户下载
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.style.display = 'none'
+        a.href = url
+        a.download = 'recorded-video.webm'
+        document.body.appendChild(a)
+        a.click()
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 100);
+      }
+
+      // 开始录制
+      mediaRecorder.start();
+    }
+
+    // 停止录制
+    stopBtn.addEventListener('click', () => {
+      mediaRecorder.stop();
+    });
+
+    
+  </script>
+</body>
+</html>

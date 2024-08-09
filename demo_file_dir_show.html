@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>显示文件目录</title>
+<style>
+  ul { list-style-type: none; }
+</style>
+</head>
+<body>
+
+<h2>请选择一个目录</h2>
+<button onclick="chooseDirectory()">选择目录</button>
+<ul id="fileList"></ul>
+
+<script>
+  async function chooseDirectory() {
+    try {
+      const directoryHandle = await window.showDirectoryPicker({
+        startIn: 'desktop'
+      });
+      const fileListElement = document.getElementById('fileList');
+      fileListElement.innerHTML = ''; // 清空之前的内容
+      await listFiles(directoryHandle, fileListElement);
+    } catch (err) {
+      console.error('Error choosing directory:', err);
+    }
+  }
+
+  async function listFiles(dirHandle, ulElement) {
+    for await (const entry of dirHandle.values()) {
+      const li = document.createElement('li');
+      
+      if (entry.kind === 'directory') {
+        li.textContent = `📁 ${entry.name}`;
+        li.style.cursor = 'pointer';
+        li.setAttribute('data-kind', entry.kind);
+        li.addEventListener('click', async (e) => {
+          if (e.target.getAttribute('data-kind') === 'directory') {
+            if (e.target.getAttribute('data-click') !== '1') {
+              e.target.setAttribute('data-click', 1);
+              const sublist = document.createElement('ul');
+              li.appendChild(sublist);
+              await listFiles(entry, sublist);
+            } else {
+              e.target.setAttribute('data-click', 0);
+              li.removeChild(li.lastChild);
+            }
+          }  
+        })
+      } else {
+        li.textContent = `📄 ${entry.name}`;
+      }
+      
+      ulElement.appendChild(li);
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      html, body {
+        width: 100%;
+        height: 100%;
+      }
+      #container {
+        width: 800px;
+        height: 400px;
+        border: 1px solid #ccc;
+        margin: 150px auto 0;
+      }
+      #draggable {
+        width: 50px;
+        height: 50px;
+        background-color: brown;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <p>文字描述...</p>
+      <div id="container">
+        <div id="draggable">Drag me!</div>
+      </div>
+    </div>
+    <script>
+      class Draggable {
+        constructor(element, options = {}) {
+          this.element = element;
+          this.dragging = false;
+          this.offset = { left: 0, top: 0 };
+          this.options = {
+            handle: options.handle || element,
+            containment: options.containment || null,
+            onDragStart: options.onDragStart || function () {},
+            onDrag: options.onDrag || function () {},
+            onDragEnd: options.onDragEnd || function () {},
+          };
+          this.init();
+          this.attachEventListeners();
+        }
+
+        init() {
+          const { width, height, left, top } = this.options.handle.getBoundingClientRect();
+          this.offset = {
+            left,
+            top,
+            width,
+            height
+          };
+          console.log(this.offset)
+          console.log(this.options.containment.getBoundingClientRect());
+        }
+
+        attachEventListeners() {
+          this.options.handle.addEventListener(
+            "mousedown",
+            this.startDragging.bind(this)
+          );
+          document.addEventListener("mouseup", this.stopDragging.bind(this));
+          document.addEventListener("mousemove", this.drag.bind(this));
+        }
+
+        startDragging(event) {
+          if (!this.dragging) {
+            this.dragging = true;
+            this.options.onDragStart(event);
+          }
+        }
+
+        stopDragging() {
+          if (this.dragging) {
+            this.dragging = false;
+            this.options.onDragEnd();
+            document.removeEventListener("mousemove", this.drag.bind(this));
+            document.removeEventListener(
+              "mouseup",
+              this.stopDragging.bind(this)
+            );
+          }
+        }
+
+        drag(event) {
+          if (this.dragging) {
+            let newX = Math.floor(event.clientX - this.offset.left - this.offset.width / 2);
+            let newY = Math.floor(event.clientY - this.offset.top - this.offset.height / 2);
+            if (this.options.containment) {
+              const { width, height, top, left } = this.options.containment.getBoundingClientRect();
+              console.log(newX, newY)
+              if (newX <= left - this.offset.left) {
+                newX = Math.floor(left - this.offset.left);
+              } else if (newX >= left + width - this.offset.left - this.offset.width) {
+                newX = Math.floor(left + width - this.offset.left - this.offset.width);
+              }
+              if (newY < top - this.offset.top) {
+                newY = Math.floor(top - this.offset.top);
+              } else if (newY > top + height - this.offset.top - this.offset.height) {
+                newY = Math.floor(top + height - this.offset.top - this.offset.height);
+              }
+            }
+            this.element.style.transform = `translate(${newX}px, ${newY}px)`;
+            this.options.onDrag(event);
+          }
+        }
+      }
+
+      // 使用示例：
+      const draggableElement = document.getElementById("draggable");
+      const myDraggable = new Draggable(draggableElement, {
+        // containment: document.getElementById("container"),
+        containment: document.body,
+        onDragStart: function (event) {
+          console.log("开始拖拽");
+        },
+        onDrag: function (event) {
+          console.log("正在拖拽");
+        },
+        onDragEnd: function (event) {
+          console.log("结束拖拽");
+        },
+      });
+    </script>
+  </body>
+</html>

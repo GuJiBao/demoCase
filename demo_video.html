@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+    .video-container {
+      /* 限制视频容器的最大宽度 */
+      max-width: 100%; /* 举例：最大宽度为1000px，根据需要调整 */
+      width: 100%; /* 让容器适应父元素宽度 */
+      position: relative; /* 用于定位视频元素 */
+      margin: 0 auto;
+    }
+
+    /* 视频元素保持原始宽高比 */
+    #remoteVideo {
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+  <div class="video-container">
+    <video id="remoteVideo" src="https://www.w3schools.com/html/mov_bbb.mp4" controls="controls" width="2560" height="1440"></video>
+  </div>
+  <script>
+    function adjustMouseCoordinates(videoElement, mouseX, mouseY) {
+      const videoRect = videoElement.getBoundingClientRect();
+      const videoAspectRatio = videoElement.videoWidth / videoElement.videoHeight;
+      const displayAspectRatio = videoRect.width / videoRect.height;
+
+      let adjustedX, adjustedY;
+      
+      // 根据视频和显示区域的宽高比决定缩放方向
+      if (videoAspectRatio > displayAspectRatio) {
+        // 以宽度为准缩放，高度可能留黑边
+        adjustedX = mouseX * (videoElement.videoWidth / videoRect.width);
+        adjustedY = mouseY * (videoElement.videoWidth / videoRect.width) * (videoElement.videoHeight / videoElement.videoWidth);
+      } else {
+        // 以高度为准缩放，宽度可能留黑边
+        adjustedX = mouseX * (videoElement.videoHeight / videoRect.height) * (videoElement.videoWidth / videoElement.videoHeight);
+        adjustedY = mouseY * (videoElement.videoHeight / videoRect.height);
+      }
+
+      return { x: adjustedX, y: adjustedY };
+    }
+
+    // 使用示例
+    const videoElement = document.querySelector('#remoteVideo');
+    document.addEventListener('mousemove', (e) => {
+      const { x, y } = adjustMouseCoordinates(videoElement, e.clientX, e.clientY);
+      console.log(`Mouse coordinates: (${x}, ${y}),${e.clientX},${e.clientY}}`);
+      // 使用调整后的坐标 x 和 y 进行远程控制操作
+    });
+  </script>
+</body>
+</html>

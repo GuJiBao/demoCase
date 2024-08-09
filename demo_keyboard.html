@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .app {
+      width: 100vw;
+      height: 100vh;
+      /* background-color: aquamarine; */
+      ime-mode:disabled
+    }
+    .input {
+      width: 200px;
+      height: 36px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="app"></div>
+  
+  <script>
+     /**
+       * 键盘keydown事件
+       */
+       const handleWindowEventKeydown = (event) => {
+        event.target.composing = true
+        // 已取消默认操作或者重复按键，不执行操作
+        if (event.repeat) {
+          return;
+        }
+        // event.preventDefault();
+        
+        // if (event.ctrlKey && event.key === 's') {
+        //   // 阻止Ctrl+S的默认保存行为
+        //   event.preventDefault();
+          
+        //   // 可以在这里添加自定义处理逻辑，例如提示用户或调用你的保存功能
+        //   console.log("Ctrl+S被屏蔽，执行自定义保存操作...");
+        // }
+        if (event.ctrlKey && event.key.toLowerCase() === 's') {
+        // 这里处理Ctrl+空格的事件
+          console.log('Ctrl+S按下');
+          event.preventDefault(); // 阻止默认行为
+          event.stopPropagation(); // 阻止事件冒泡
+        }
+        console.log('===========', event)
+      };
+
+      const handleWindowEventKeyup = (event) => {
+        // 已取消默认操作或者重复按键，不执行操作
+        if (event.repeat) {
+          return;
+        }
+        
+        console.log(`keyup`, event)
+      };
+
+      window.onblur = function() {
+        console.log('window blur')
+      }
+
+      // let app = document.getElementById('app')
+
+      // app.addEventListener("keydown", handleWindowEventKeydown);
+      // app.addEventListener("keyup", handleWindowEventKeyup);
+
+      document.addEventListener("keydown", handleWindowEventKeydown);
+      document.addEventListener("keyup", handleWindowEventKeyup);
+  </script>
+</body>
+</html>
