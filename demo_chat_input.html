@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Input Box with Image Support</title>
+    <style>
+        .chat-input {
+            width: 80%;
+            height: 350px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            outline: none;
+        }
+        .send-button {
+            margin-top: 10px;
+        }
+        .chat-input img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="chatInputContainer">
+        <div id="chatInput" class="chat-input" contenteditable="true" placeholder="在这里输入文字或粘贴内容"></div>
+        <button id="sendButton" class="send-button">发送</button>
+    </div>
+
+    <script>
+        // 获取 DOM 元素
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // 监听粘贴事件
+        chatInput.addEventListener('paste', handlePaste, false);
+
+        // 监听键盘事件
+        chatInput.addEventListener('keydown', handleKeyDown, false);
+
+        // 监听发送按钮点击事件
+        sendButton.addEventListener('click', handleSend, false);
+
+        // 处理粘贴事件
+        function handlePaste(event) {
+            event.preventDefault();
+            const clipboardData = event.clipboardData || window.clipboardData;
+            if (!clipboardData) return;
+
+            const items = clipboardData.items;
+
+            let textContent = '';
+            let imageFiles = [];
+
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    // 图片
+                    imageFiles.push(items[i].getAsFile());
+                } else if (items[i].type === 'text/plain') {
+                    // 文本
+                    textContent += clipboardData.getData('Text') + '\n';
+                }
+            }
+
+            // 将粘贴的文本插入到输入框
+            chatInput.innerHTML += textContent;
+
+            // 处理图片
+            imageFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const base64Image = e.target.result;
+                    const imgElement = document.createElement('img');
+                    imgElement.src = base64Image;
+                    imgElement.alt = "粘贴的图片";
+                    imgElement.style.maxWidth = "100%";
+                    imgElement.style.height = "auto";
+                    chatInput.appendChild(imgElement);
+
+                    // 重新定位光标
+                    setCursorToEnd(chatInput);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // 重新定位光标
+            setCursorToEnd(chatInput);
+
+            // 重新聚焦输入框
+            chatInput.focus();
+        }
+
+        // 处理键盘事件
+        function handleKeyDown(event) {
+            if (event.ctrlKey && event.keyCode === 13) { // Ctrl + Enter
+                event.preventDefault();
+                insertNewline(chatInput);
+            } else if (event.keyCode === 13) { // Enter
+                event.preventDefault();
+                handleSend();
+            }
+        }
+
+        // 插入换行符
+        function insertNewline(element) {
+            const sel = window.getSelection();
+            if (sel.rangeCount) {
+                const range = sel.getRangeAt(0);
+                const br = document.createElement('br');
+                range.insertNode(br);
+                range.setStartAfter(br);
+                range.setEndAfter(br);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        }
+
+        // 发送功能
+        function handleSend() {
+            const textContent = chatInput.innerHTML.trim();
+
+            if (textContent !== '') {
+                // 提取文字内容
+                const textNodes = extractTextNodes(chatInput);
+
+                // 发送文字内容
+                if (textNodes.length > 0) {
+                    console.log('发送文字:', textNodes.join(''));
+                }
+
+                // 提取图片内容
+                const images = chatInput.querySelectorAll('img');
+                if (images.length > 0) {
+                    console.log('发送图片:', Array.from(images).map(img => img.src));
+                }
+
+                // 清空输入框
+                chatInput.innerHTML = '';
+            }
+        }
+
+        // 提取文字节点
+        function extractTextNodes(node) {
+            const textNodes = [];
+            const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+
+            while (walker.nextNode()) {
+                textNodes.push(walker.currentNode.textContent.trim());
+            }
+
+            return textNodes.filter(text => text !== '');
+        }
+
+        // 重新定位光标到末尾
+        function setCursorToEnd(element) {
+          const range = document.createRange();
+          range.selectNodeContents(element);
+          range.collapse(false);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+    </script>
+</body>
+</html>
