@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      function getBrowserFingerprint() {
+        const fingerprint = {
+          userAgent: navigator.userAgent,
+          language: navigator.language,
+          platform: navigator.platform,
+          screenResolution: `${screen.width}x${screen.height}`,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          colorDepth: screen.colorDepth,
+          plugins: Array.from(navigator.plugins)
+            .map((plugin) => plugin.name)
+            .join(","),
+          fonts: getFonts(),
+        };
+
+        return JSON.stringify(fingerprint);
+
+        function getFonts() {
+          const testElement = document.createElement("span");
+          const defaultFont = "monospace";
+          const availableFonts = [
+            "Arial",
+            "Times New Roman",
+            "Courier New",
+            "Verdana",
+            "Georgia",
+            "Palatino",
+            "Helvetica",
+            "Tahoma",
+            "Trebuchet MS",
+          ];
+          const fonts = [];
+
+          for (const font of availableFonts) {
+            testElement.style.fontFamily = `${font}, ${defaultFont}`;
+            if (testElement.offsetWidth !== testElement.scrollWidth) {
+              fonts.push(font);
+            }
+          }
+
+          return fonts.join(",");
+        }
+      }
+
+      const fingerprint = getBrowserFingerprint()
+
+      console.log(fingerprint)
+
+      // 示例：发送指纹信息到服务器
+      // fetch("/api/fingerprint", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ fingerprint: getBrowserFingerprint() }),
+      // })
+      //   .then((response) => response.json())
+      //   .then((data) => console.log("Fingerprint sent successfully:", data))
+      //   .catch((error) => console.error("Error sending fingerprint:", error));
+    </script>
+  </body>
+</html>

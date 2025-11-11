@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>首页</title>
+</head>
+<body>
+
+  <script>
+    function changeTitle() {
+      document.title = "Hello World";
+    }
+    let title = document.title;
+    let index = 1;
+    setInterval(() => {
+      index += 1;
+      if (index % 2 === 0) {
+        document.title = "你有新消息：" + index;
+      } else {
+        document.title = title;
+      }
+    }, 1000)
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+ <span id="span"></span>
+
+ <script>
+  var span = document.getElementById("span");
+  var str = "您好！使用Youtochat平台，您可以按照以下步骤操作：\n\n1. 登录Youtochat平台，进入【接待配置】。\n2. 选择【三方渠道接入】，然后选择【WhatsApp代理设备】选项。\n3. 如果尚未购买代理设备，请点击【购买设备】按钮添加设备。购买后需等待一段时间。\n4. 绑定设备：选中已开通的代理设备卡片，点击【立即链接】或【重新连接】按钮，使用待绑定的WhatsApp账号扫描授权二维码。\n5. 绑定成功后，进行【渠道配置】，选择所属项目和服务客服，点击保存。\n6. 配置完成后，Youtochat客户端即可与访客进行信息沟通。\n\n请注意，代理设备过期后会被释放，无法续费找回，所以建议在购买时勾选自动续费并保持足够余额。希望这些信息对您有帮助！如有更多问题，欢迎随时咨询。";
+  span.innerHTML = str.replace(/\n/g, "<br>");
+
+
+ </script>
+</body>
+</html>

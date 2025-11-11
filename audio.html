@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>语音留言</title>
+</head>
+<body>
+    <h1>语音留言</h1>
+    <button id="recordButton">开始录音</button>
+    <button id="stopButton" disabled>停止录音</button>
+    <ul id="audioList"></ul>
+
+    <script src="https://cdn.jsdelivr.net/npm/recorder.js"></script>
+    <script>
+        let recorder;
+        let audioChunks = [];
+        const recordButton = document.getElementById('recordButton');
+        const stopButton = document.getElementById('stopButton');
+        const audioList = document.getElementById('audioList');
+
+        recordButton.addEventListener('click', async () => {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            recorder = new Recorder(stream);
+            recorder.record();
+            recordButton.disabled = true;
+            stopButton.disabled = false;
+        });
+
+        stopButton.addEventListener('click', () => {
+            recorder.stop();
+            recorder.getBuffer((buffer) => {
+                const blob = new Blob(buffer, { type: 'audio/wav' });
+                const url = URL.createObjectURL(blob);
+                saveAudio(url);
+                recordButton.disabled = false;
+                stopButton.disabled = true;
+            });
+        });
+
+        function saveAudio(url) {
+            const li = document.createElement('li');
+            const audio = document.createElement('audio');
+            const playButton = document.createElement('button');
+            const deleteButton = document.createElement('button');
+
+            audio.src = url;
+            audio.controls = true;
+            playButton.textContent = '播放';
+            deleteButton.textContent = '删除';
+
+            playButton.addEventListener('click', () => {
+                audio.play();
+            });
+
+            deleteButton.addEventListener('click', () => {
+                li.remove();
+            });
+
+            li.appendChild(audio);
+            li.appendChild(playButton);
+            li.appendChild(deleteButton);
+            audioList.appendChild(li);
+        }
+    </script>
+</body>
+</html>

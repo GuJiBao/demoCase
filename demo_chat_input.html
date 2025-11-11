@@ -25,23 +25,44 @@
 </head>
 <body>
     <div id="chatInputContainer">
+
         <div id="chatInput" class="chat-input" contenteditable="true" placeholder="在这里输入文字或粘贴内容"></div>
         <button id="sendButton" class="send-button">发送</button>
+        <button id="pasteButton" class="paste-button">粘贴</button>
     </div>
 
     <script>
         // 获取 DOM 元素
         const chatInput = document.getElementById('chatInput');
         const sendButton = document.getElementById('sendButton');
+        const pasteButton = document.getElementById('pasteButton');
 
         // 监听粘贴事件
         chatInput.addEventListener('paste', handlePaste, false);
 
         // 监听键盘事件
-        chatInput.addEventListener('keydown', handleKeyDown, false);
+        // chatInput.addEventListener('keydown', handleKeyDown, false);
 
         // 监听发送按钮点击事件
         sendButton.addEventListener('click', handleSend, false);
+
+        pasteButton.addEventListener('click', function () {
+            // const clipboardData = navigator.clipboard.readText();
+            // chatInput.innerHTML += clipboardData;
+
+            // 触发chatInput的粘贴事件
+            chatInput.focus()
+            document.execCommand('insertText', false, 'hello world')
+
+
+            // chatInput.focus();
+            // chatInput.dispatchEvent(new Event('paste'));
+            // document.execCommand('paste');
+
+
+            // 阻止默认粘贴行为
+            event.preventDefault();
+        });
 
         // 处理粘贴事件
         function handlePaste(event) {
